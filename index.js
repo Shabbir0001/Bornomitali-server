@@ -40,15 +40,26 @@ client.connect(err => {
   app.get('/products', (req, res)=> {
     productsCollection.find({})
     .toArray((error, items) => {
-      res.send(items)
+      res.send(items);
     })
   })
 
   app.delete('/deleteProduct/:id', (req, res)=>{
     const id = ObjectId(req.params.id);
-    // console.log("delete this", id);
     productsCollection.deleteOne({_id: id})
     .then(documents => res.send(documents))
+  })
+
+  app.patch('/editProduct/:id', (req, res)=>{
+    const id = ObjectId(req.params.id);
+    productsCollection.updateOne({_id: id}, 
+        {
+          $set: {name: req.body.name, price: req.body.price, imageURL: req.body.imageURL}
+        }
+      )
+      .then(result =>{
+        res.send(result.modifiedCount > 0)
+      })
   })
 
   // client.close();
